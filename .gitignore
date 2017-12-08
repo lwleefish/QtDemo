@@ -1,0 +1,8 @@
+WindowsDemo/.vs/*
+WindowsDemo/x64/*
+WindowsDemo/Win32/*
+WindowsDemo/Debug/*
+WindowsDemo/WindowDemo/image/*
+WindowsDemo/WindowDemo/x64/*
+WindowsDemo/WindowDemo/Debug/*
+WindowsDemo/WindowDemo/Release/*
