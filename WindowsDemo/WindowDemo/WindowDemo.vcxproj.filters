@@ -65,15 +65,6 @@
     <ClCompile Include="GeneratedFiles\Release\moc_TitleBar.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="GeneratedFiles\Debug\moc_qqq.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="GeneratedFiles\Release\moc_qqq.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="qqq.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ScreenShot.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -88,17 +79,8 @@
     <CustomBuild Include="TitleBar.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="qqq.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
-    <CustomBuild Include="qqq.ui">
-      <Filter>Form Files</Filter>
-    </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GeneratedFiles\ui_qqq.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="ScreenShot.h">
       <Filter>Header Files</Filter>
     </ClInclude>

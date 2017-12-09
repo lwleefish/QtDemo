@@ -104,7 +104,7 @@ void WindowDemo::capture()
 {
 	QScreen *capture = QGuiApplication::primaryScreen();
 	QPixmap background = capture->grabWindow(0);//.save("123.jpg", "jpg");
-	ScreenShot *screen = new ScreenShot();
+	ScreenShot *screen = new ScreenShot(background);
 	screen->show();
 }
 WindowDemo::~WindowDemo()
