@@ -1,13 +1,17 @@
 #include "ScreenShot.h"
-
+#define Min(X,Y) (X < Y ? X : Y)
 ScreenShot::ScreenShot(QPixmap pixMap)
 {
 	this->backgroundPixMap = pixMap;
+	lbe_pos = new QLabel(this);
+	lbe_pos->setStyleSheet("color: white");
 	setWindowState(Qt::WindowFullScreen);
-	
 	setCursor(Qt::CrossCursor);
 	setMouseTracking(true);
 	//this->setAttribute(Qt::WA_TranslucentBackground, true);
+	//auto s = selectedRect.width() + "123";
+	//QRect()
+	
 }
 
 void ScreenShot::loadBackground()
@@ -15,8 +19,8 @@ void ScreenShot::loadBackground()
 }
 void ScreenShot::beginDrag(QPoint& P)
 {
-	AtRectPos pos = getPosAtRect(P);
-	switch (pos)
+	DragDirection = getPosAtRect(P);
+	switch (DragDirection)
 	{
 	case AtNone:
 		break;
@@ -24,38 +28,54 @@ void ScreenShot::beginDrag(QPoint& P)
 	{
 		currentState = BeginCapture;
 		selectedRect = QRect(selectedRect.bottomRight(), selectedRect.bottomRight());
-		beginScreenShotPoint = selectedRect.bottomRight();
-	}
-	break;
-	case AtTop:
+		fixedPoint = selectedRect.bottomRight();
 		break;
+	}
+	case AtTop:
+	{
+		currentState = BeginDrag;
+		fixedPoint = selectedRect.bottomLeft();
+		break;
+	}
 	case AtRightTop:
 	{
 		currentState = BeginCapture;
 		selectedRect = QRect(selectedRect.bottomLeft(), selectedRect.bottomLeft());
-		beginScreenShotPoint = selectedRect.bottomLeft();
+		fixedPoint = selectedRect.bottomLeft();
+		break;
 	}
-		break;
 	case AtRight:
+	{
+		currentState = BeginDrag;
+		fixedPoint = selectedRect.topLeft();
 		break;
+	}
 	case AtRightBottom:
 	{
 		currentState = BeginCapture;
 		selectedRect = QRect(selectedRect.topLeft(), selectedRect.topLeft());
-		beginScreenShotPoint = selectedRect.topLeft();
+		fixedPoint = selectedRect.topLeft();
+		break;
 	}
-		break;
 	case AtBottom:
+	{
+		currentState = BeginDrag;
+		fixedPoint = selectedRect.topLeft();
 		break;
+	}
 	case AtLeftBottom:
 	{
 		currentState = BeginCapture;
 		selectedRect = QRect(selectedRect.topRight(), selectedRect.topRight());
-		beginScreenShotPoint = selectedRect.topRight();
+		fixedPoint = selectedRect.topRight();
+		break;
 	}
-		break;
 	case AtLeft:
+	{
+		currentState = BeginDrag;
+		fixedPoint = selectedRect.topRight();
 		break;
+	}
 	default:
 		break;
 	}
@@ -75,6 +95,7 @@ void ScreenShot::mousePressEvent(QMouseEvent *e)
 		{
 			currentState = Init;
 			selectedRect = QRect(0, 0, 0, 0);
+			lbe_pos->hide();
 			update();
 			return;
 		}
@@ -86,9 +107,8 @@ void ScreenShot::mousePressEvent(QMouseEvent *e)
 		case Init:
 			currentState = BeginCapture;
 			selectedRect = QRect(e->pos(), e->pos());
-			beginScreenShotPoint = e->pos();
-			break;
-		case BeginCapture:
+			fixedPoint = e->pos();
+			lbe_pos->show();
 			break;
 		case FinishCapture:
 			if (selectedRect.contains(e->pos()))
@@ -129,8 +149,11 @@ void ScreenShot::mouseReleaseEvent(QMouseEvent * event)
 		case BeginMove:
 			currentState = FinishCapture;
 			break;
-		case BeginDrag:
+		case BeginDrag: {
+			currentState = FinishCapture;
+			DragDirection = AtNone;
 			break;
+		}
 		default:
 			break;
 		}
@@ -145,45 +168,55 @@ void ScreenShot::mouseMoveEvent(QMouseEvent * event)
 		case Init:
 			break;
 		case BeginCapture: {
+			//int left_ = qMin(fixedPoint.x(), event->x());
+			//int top_ = Min(fixedPoint.y(), event->y());
+			//int width_ = qAbs(fixedPoint.x() - event->x());
+			//int heigth_ = qAbs(fixedPoint.y() - event->y());
+			//selectedRect = QRect(left_, top_, width_, heigth_);
 			QPoint topL, bottomR;
-			if (beginScreenShotPoint.x() <= event->x() && beginScreenShotPoint.y() <= event->y())
+			if (fixedPoint.x() <= event->x() && fixedPoint.y() <= event->y())
 			{
-				topL = beginScreenShotPoint;
+				topL = fixedPoint;
 				bottomR = event->pos();
 			}
-			else if (beginScreenShotPoint.x() <= event->x() && beginScreenShotPoint.y() > event->y())
+			else if (fixedPoint.x() <= event->x() && fixedPoint.y() > event->y())
 			{
-				topL = QPoint(beginScreenShotPoint.x(), event->y());
-				bottomR = QPoint(event->x(), beginScreenShotPoint.y());
+				topL = QPoint(fixedPoint.x(), event->y());
+				bottomR = QPoint(event->x(), fixedPoint.y());
 			}
-			else if (beginScreenShotPoint.x() > event->x() && beginScreenShotPoint.y() <= event->y())
+			else if (fixedPoint.x() > event->x() && fixedPoint.y() <= event->y())
 			{
-				topL = QPoint(event->x(), beginScreenShotPoint.y());
-				bottomR = QPoint(beginScreenShotPoint.x(), event->y());
+				topL = QPoint(event->x(), fixedPoint.y());
+				bottomR = QPoint(fixedPoint.x(), event->y());
 			}
 			else
 			{
 				topL = event->pos();
-				bottomR = beginScreenShotPoint;
+				bottomR = fixedPoint;
 			}
 			selectedRect = QRect(topL, bottomR);
-		}
 			break;
+
+		}
 		case FinishCapture:
 			break;
-		case BeginMove:{
+		case BeginMove: {
 			int delta_x = 0, delta_y = 0;
 			delta_x = event->x() - beginMovePoint.x();
 			delta_y = event->y() - beginMovePoint.y();
 			selectedRect = QRect(selectedRect.left() + delta_x, selectedRect.top() + delta_y, selectedRect.width(), +selectedRect.height());
 			beginMovePoint = event->pos();
-		}
 			break;
+		}
 		case BeginDrag:
+			dragEvent(event->pos());
 			break;
 		default:
 			break;
 		}
+		lbe_pos->setText(QString("%1,%2").arg(selectedRect.width()).arg(selectedRect.height()));
+		lbe_pos->setGeometry(QRect(selectedRect.left(), selectedRect.top() - 15 > 0 ? selectedRect.top() - 15 : 0, 60, 15));
+		//repaint();
 		update();
 	}
 	else if (event->button() == Qt::NoButton && currentState == FinishCapture)
@@ -198,10 +231,36 @@ void ScreenShot::mouseMoveEvent(QMouseEvent * event)
 		}
 	}
 }
+void ScreenShot::dragEvent(QPoint& P)
+{
+	if (DragDirection == AtRight || DragDirection == AtLeft) {
+		if (P.x() >= fixedPoint.x()){
+			selectedRect = QRect(fixedPoint.x(), fixedPoint.y(), P.x() - fixedPoint.x(), selectedRect.height());
+		} 
+		else{
+			selectedRect = QRect(P.x(), fixedPoint.y(),  fixedPoint.x() - P.x(), selectedRect.height());
+		}
+	}
+	else if (DragDirection == AtTop || DragDirection == AtBottom) {
+		if (P.y() >= fixedPoint.y()){
+			selectedRect = QRect(fixedPoint.x(), fixedPoint.y(), selectedRect.width(), P.y() - fixedPoint.y());
+		} 
+		else{
+			selectedRect = QRect(fixedPoint.x(), P.y(), selectedRect.width(), fixedPoint.y() - P.y());
+		}
+	}
+}
 AtRectPos ScreenShot::getPosAtRect(QPoint& P)
 {
-	AtRectPos pos;
+	AtRectPos pos = AtNone;
 	int wid = 2;
+	int left_ = selectedRect.left() - wid;
+	int top_ = selectedRect.top() - wid;
+	int width_ = selectedRect.width() + 2 * wid;
+	int height_ = selectedRect.height() + 2 * wid;
+	if (!QRect(left_, top_, width_, height_).contains(P)) {
+		return pos;
+	}
 	if (qAbs(P.x() - selectedRect.left()) <= wid)
 	{
 		pos = AtLeft;
@@ -247,7 +306,7 @@ AtRectPos ScreenShot::getPosAtRect(QPoint& P)
 void ScreenShot::paintEvent(QPaintEvent * event)
 {
 	QColor color(0, 157, 217);  //选区边框
-	QColor shadowColor(0, 0, 0, 100);  //阴影颜色设置
+	QColor shadowColor(0, 0, 0, 120);  //阴影颜色设置
 	//QPainter painter(this);
 	painter.begin(this);
 	painter.setPen(QPen(color, 2, Qt::SolidLine, Qt::FlatCap));
@@ -272,4 +331,5 @@ void ScreenShot::paintEvent(QPaintEvent * event)
 
 ScreenShot::~ScreenShot()
 {
+	delete lbe_pos;
 }

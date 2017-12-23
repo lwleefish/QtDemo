@@ -40,7 +40,7 @@ TitleBar::TitleBar(QWidget *parent) : QWidget(parent)
 	
 	
 	this->setLayout(&m_bar_btnLayout);
-	this->setFixedHeight(30);
+	this->setFixedHeight(180);
 	this->setMinimumWidth(400);
 	this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
 	connect(&m_bar_closeBtn, SIGNAL(clicked()), this, SLOT(closeWindow()));
@@ -61,7 +61,6 @@ void TitleBar::paintEvent(QPaintEvent *event)
 	else {
 		m_bar_closeBtn.setText("hello");
 	}
-
 }
 TitleBar::~TitleBar()
 {

@@ -35,17 +35,18 @@ private:
 	QPixmap backgroundPixMap; //背景图
 	QRect selectedRect = QRect(0, 0, 0, 0); //选区
 	CaptureState currentState = Init;
-	QPoint beginScreenShotPoint;
+	QPoint fixedPoint;
 	QPoint beginMovePoint;
-	QLabel lbe_pos;
-	//int _x = 0; //选区起点X
-	//int _y = 0; //Y
-
-private:
+	QLabel* lbe_pos;
+	AtRectPos DragDirection;
 	void loadBackground();
 	void beginDrag(QPoint&);
 	AtRectPos getPosAtRect(QPoint&);
-	/*********事件*******************/
+	//int _x = 0; //选区起点X
+	//int _y = 0; //Y
+
+protected:
+	void dragEvent(QPoint&);
 	void mousePressEvent(QMouseEvent*);
 	void mouseMoveEvent(QMouseEvent *event);
 	void mouseReleaseEvent(QMouseEvent *event);

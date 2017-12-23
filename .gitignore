@@ -6,3 +6,5 @@ WindowsDemo/WindowDemo/image/*
 WindowsDemo/WindowDemo/x64/*
 WindowsDemo/WindowDemo/Debug/*
 WindowsDemo/WindowDemo/Release/*
+WindowsDemo/WindowDemo/GeneratedFiles/*
+WindowsDemo/WindowsDemo.VC*
