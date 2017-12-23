@@ -8,6 +8,7 @@
 #include "QDesktopServices"
 #include <stdio.h>
 #include <windows.h>
+
 #define HEAD_BM  0x4D42
 #define HEAD_PNG 0x5089
 #define HEAD_GFT1 0x4754
@@ -51,9 +52,31 @@ WindowDemo::WindowDemo(QWidget *parent)
 	connect(reg, SIGNAL(clicked()), this, SLOT(reghref()));
 	connect(findpwd, SIGNAL(clicked()), this, SLOT(findpwdhref()));
 	connect(pTrailingAction, SIGNAL(triggered(bool)), this, SLOT(openKeyBoard(bool)));
+	connect(autologin, SIGNAL(stateChanged(int)), this, SLOT(checkedChange(int)));
+	connect(rememberpwd, SIGNAL(stateChanged(int)), this, SLOT(checkedChange(int)));
+	connect(login, SIGNAL(clicked()), this, SLOT(checkPassword()));
 	//register_key_hook();
-	QMap<int, QString> map;
+	//QMap<int, QString> map;
 	
+}
+//密码确认
+void WindowDemo::checkPassword()
+{
+	if (te_password->text() == "123546" && cbx_username->currentText() == "666666") {
+		qDebug() << Str("登陆成功");
+		return;
+	}
+	qDebug() << Str("密码错误");
+}
+void WindowDemo::checkedChange(int state)
+{
+	QCheckBox *cb = qobject_cast<QCheckBox *>(sender());
+	if (cb->property("distinguish") == "rememberpwd" && !cb->isChecked()) {
+		autologin->setChecked(false);
+	}
+	else if (cb->property("distinguish") == "autologin"  &&autologin->checkState() == Qt::Checked){
+		rememberpwd->setCheckState(Qt::Checked);
+	}
 }
 void WindowDemo::openKeyBoard(bool checked)
 {
@@ -116,10 +139,13 @@ void WindowDemo::initLayout()
 	rememberpwd->setMinimumHeight(30);
 	rememberpwd->setText(QStringLiteral("记住密码"));
 	rememberpwd->setStyleSheet("QCheckBox{color:rgb(101, 101, 101);}");
+	rememberpwd->setProperty("distinguish", "rememberpwd");
+
 	autologin = new QCheckBox;
 	autologin->setText(QStringLiteral("自动登录"));
 	autologin->setStyleSheet("QCheckBox{color:rgb(101, 101, 101);}");
-	
+	autologin->setProperty("distinguish", "autologin");
+
 	check_layout_h = new QHBoxLayout;
 	check_layout_h->addWidget(rememberpwd, 0, Qt::AlignLeft);
 	check_layout_h->addWidget(autologin, 0, Qt::AlignRight);
@@ -153,6 +179,7 @@ void WindowDemo::initLayout()
 	qcapture->setText(Str("Capture"));
 	main_layout_v->addWidget(qcapture, 0, Qt::AlignBottom);
 }
+
 void WindowDemo::closeWindow()
 {
 	this->close();
@@ -289,6 +316,8 @@ void WindowDemo::capture()
 //}
 WindowDemo::~WindowDemo()
 {
+	delete titlebar;
+	delete profile;
 	//unregister_key_hook();
 }
 

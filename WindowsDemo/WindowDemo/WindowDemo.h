@@ -48,9 +48,11 @@ private slots:
 	void reghref();
 	void findpwdhref();
 	void openKeyBoard(bool);
+	void checkedChange(int);
+	void checkPassword();
 private:
 	QVBoxLayout* main_layout_v;
-	QHBoxLayout main_layout_h;
+	//QHBoxLayout main_layout_h;
 	QHBoxLayout *check_layout_h;
 	QGridLayout* grid_layout;
 	TitleBar *titlebar;

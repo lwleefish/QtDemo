@@ -13,6 +13,7 @@ protected:
 	void paintEvent(QPaintEvent *);
 private slots:
 	void showStateMemu();
+	void changeState(QAction*);
 private: 
 	QPushButton *state;
 	QMenu *menu;
